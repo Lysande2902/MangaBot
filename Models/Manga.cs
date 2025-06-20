@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MangaApi.Models
 {
     public class Manga
     {
+        [Key]
         public int ID { get; set; }
         public required string Titulo { get; set; }
         public required string Genero { get; set; }

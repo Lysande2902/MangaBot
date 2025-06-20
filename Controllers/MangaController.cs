@@ -9,9 +9,9 @@ namespace MangaApi.Controllers
     [ApiController]
     public class MangaController : ControllerBase
     {
-        private readonly MangaContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public MangaController(MangaContext context)
+        public MangaController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -41,6 +41,13 @@ namespace MangaApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Manga>> PostManga(Manga manga)
         {
+            // Verificar si ya existe un manga con el mismo título
+            var mangaExistente = await _context.Mangas.FirstOrDefaultAsync(m => m.Titulo.ToLower() == manga.Titulo.ToLower());
+            if (mangaExistente != null)
+            {
+                return Conflict(new { message = "Ya existe un manga con ese título." });
+            }
+
             _context.Mangas.Add(manga);
             await _context.SaveChangesAsync();
 
@@ -81,6 +88,13 @@ namespace MangaApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteManga(int id)
         {
+            // Verificar si el manga tiene préstamos asociados
+            var tienePrestamos = await _context.Prestamos.AnyAsync(p => p.Manga_ID == id);
+            if (tienePrestamos)
+            {
+                return BadRequest(new { message = "No se puede eliminar el manga porque tiene préstamos asociados." });
+            }
+
             var manga = await _context.Mangas.FindAsync(id);
             if (manga == null)
             {

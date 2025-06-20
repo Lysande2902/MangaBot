@@ -1,34 +1,27 @@
 using MangaApi.Data;
+using MangaApi.Models;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-// Configuración de la cadena de conexión a la base de datos
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
-{
-    throw new InvalidOperationException("The connection string 'DefaultConnection' was not found.");
-}
-builder.Services.AddDbContext<MangaContext>(options => options.UseMySQL(connectionString));
+// Configuración de la cadena de conexión para ApplicationDbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySQL(connectionString));
 
-// Habilitar Swagger
+builder.Services.AddControllers(); // Registra los controladores
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddControllers();
+builder.Services.AddSwaggerGen(); // Habilita Swagger para la API
 
 var app = builder.Build();
 
 // Configurar el middleware de Swagger
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
