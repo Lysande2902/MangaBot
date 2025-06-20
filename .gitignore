@@ -1,0 +1,16 @@
+# .gitignore para .NET Core
+
+# Archivos y carpetas que no deben subirse a Git
+bin/
+obj/
+.vs/
+.vscode/
+
+# Ignorar archivos específicos de configuración como appsettings.json
+appsettings.json
+
+# Otras configuraciones
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
