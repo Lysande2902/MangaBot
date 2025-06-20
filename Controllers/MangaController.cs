@@ -1,5 +1,6 @@
 using MangaApi.Data;
 using MangaApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace MangaApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MangaController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

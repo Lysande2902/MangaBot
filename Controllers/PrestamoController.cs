@@ -1,5 +1,6 @@
 using MangaApi.Data;
 using MangaApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace MangaApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PrestamoController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -76,11 +78,7 @@ namespace MangaApi.Controllers
             _context.Prestamos.Add(prestamo);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(
-                nameof(GetPrestamo),
-                new { id = prestamo.ID },
-                prestamo
-            );
+            return CreatedAtAction(nameof(GetPrestamo), new { id = prestamo.ID }, prestamo);
         }
 
         // PUT: api/prestamo/{id}
@@ -96,7 +94,9 @@ namespace MangaApi.Controllers
             var mangaExiste = await _context.Mangas.AnyAsync(m => m.ID == prestamo.Manga_ID);
             if (!mangaExiste)
             {
-                return BadRequest(new { message = "El manga que intenta asociar al préstamo no existe." });
+                return BadRequest(
+                    new { message = "El manga que intenta asociar al préstamo no existe." }
+                );
             }
 
             _context.Entry(prestamo).State = EntityState.Modified;
